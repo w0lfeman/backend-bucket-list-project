@@ -1,8 +1,8 @@
 {
   "development": {
-    "username": " fqyliedg",
+    "username": "fqyliedg",
     "password": "HasSMFH-jYnB-hA_ROi4Dp9Fpfe5PTIA",
-    "database": " fqyliedg",
+    "database": "fqyliedg",
     "host": "berry.db.elephantsql.com",
     "dialect": "postgres"
   },
