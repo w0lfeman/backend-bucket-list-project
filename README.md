@@ -16,6 +16,3 @@ Models:
     -cost
     -by_when
     -name
-
-
-    
