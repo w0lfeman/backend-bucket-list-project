@@ -1,10 +1,14 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 app.use(express.static(__dirname + "/FrontEnd"));
+const { Users, Items } = require("./models");
+const { Op } = require("sequelize");
 
-app.post("/newuser", async (req, res) => {
+//CREATE NEW USER - Working
+app.post("/newuser", (req, res) => {
   const { firstname, lastname, email, username, password, age } = req.body;
-  User.create({
+  Users.create({
     firstname: firstname,
     lastname: lastname,
     email: email,
@@ -21,17 +25,62 @@ app.post("/newuser", async (req, res) => {
     });
 });
 
-app.get("/B", (req, res) => {
-  res.json({});
+//FIND ALL USERS - Working, have not linked with items yet
+app.get("/users", (req, res) => {
+  Users.findAll({
+    attributes: ["id", "firstname", "lastname", "email"],
+    // include: [
+    //   {
+    //     model: items,
+    //     attributes: ["location", "cost", "bywhen", "name"],
+    //   },
+    // ],
+  }).then((users) => {
+    console.log(users);
+
+    res.json(users);
+  });
 });
 
-app.get("/C", (req, res) => {
-  res.json({});
+//GET User by first or last name
+app.post("/users/search", (req, res) => {
+  console.log(req.params);
+  console.log(req.query);
+  const { search } = req.body;
+  console.log(search);
+
+  Users.findAll({
+    attributes: ["id", "firstname", "lastname", "email", "age"],
+    where: {
+      [Op.or]: [
+        {
+          firstname: {
+            [Op.iLike]: "%" + search + "%",
+          },
+        },
+        {
+          lastname: {
+            [Op.iLike]: "%" + search + "%",
+          },
+        },
+      ],
+    },
+  }).then((users) => {
+    res.json(users);
+  });
 });
 
-app.get("/D", (req, res) => {
-  res.json({});
-});
+//DELETE USER -- Incomplete until we solve the ID issue
+// app.delete("/users/:id", (req, res) => {
+//   User.destroy({
+//     where: {
+//       id: req.params.id,
+//     },
+//   }).then((results) => {
+//     console.log(results);
+//     res.json({});
+//   });
+// });
 
 app.listen(3000, () => {
   console.log("App has started on http://localhost:3000/");
