@@ -2,19 +2,42 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 app.use(express.static(__dirname + "/FrontEnd"));
-const { Users, Items } = require("./models");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+const SessionStore = require("express-session-sequelize")(session.Store);
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+const { Users, Items, sequelize } = require("./models");
 const { Op } = require("sequelize");
+const BucketSession = new SessionStore({
+  db: sequelize,
+});
+
+//Session Setup
+app.use(cookieParser());
+app.use(session({
+  secret: 'LarryDavid',
+  resave: false,
+  saveUninitialized: true,
+  store: BucketSession,
+  cookie: {
+    maxAge: 1000 * 3600
+  }
+}));
+
 
 //PROFILE BACKEND///////////////////////////////////////////
 //CREATE NEW USER - Working
 app.post("/newuser", (req, res) => {
+  console.log(req.session);
   const { firstname, lastname, email, username, password, age } = req.body;
+  let hashedPassword = bcrypt.hashSync(password, saltRounds);
   Users.create({
     firstname: firstname,
     lastname: lastname,
     email: email,
     username: username,
-    password: password,
+    password: hashedPassword,
     age: age,
   })
     .then((newUser) => {
@@ -29,6 +52,7 @@ app.post("/newuser", (req, res) => {
 
 //FIND ALL USERS - Working, have not linked with items yet
 app.get("/users", (req, res) => {
+  console.log(req.session);
   Users.findAll({
     attributes: ["id", "firstname", "lastname", "email"],
     // include: [
@@ -47,6 +71,7 @@ app.get("/users", (req, res) => {
 
 //GET User by first or last name
 app.post("/users/search", (req, res) => {
+  console.log(req.session);
   console.log(req.params);
   console.log(req.query);
   const { search } = req.body;
@@ -76,6 +101,7 @@ app.post("/users/search", (req, res) => {
 
 // DELETE USER
 app.delete("/users/:id", (req, res) => {
+  console.log(req.session);
   Users.destroy({
     where: {
       id: req.params.id,
@@ -90,6 +116,7 @@ app.delete("/users/:id", (req, res) => {
 //BUCKETLIST BACKEND//////////////////////////////////
 //CREATE NEW ITEM - Working
 app.post("/newitem", (req, res) => {
+  console.log(req.session);
   const { location, cost, bywhen, name } = req.body;
   Items.create({
     location: location,
@@ -109,6 +136,7 @@ app.post("/newitem", (req, res) => {
 
 //FIND ALL Items - Working, have not linked with items yet
 app.get("/Items", (req, res) => {
+  console.log(req.session);
   Items.findAll({
     attributes: ["id", "location", "cost", "bywhen", "name"],
 
@@ -122,6 +150,7 @@ app.get("/Items", (req, res) => {
 
 //GET Items by LOCATION or BYWHEN
 app.post("/items/search", (req, res) => {
+  console.log(req.session);
   console.log(req.params);
   console.log(req.query);
   const { search } = req.body;
@@ -151,6 +180,7 @@ app.post("/items/search", (req, res) => {
 
 //GET Items by LOCATION or BYWHEN
 app.post("/items/search", (req, res) => {
+  console.log(req.session);
   console.log(req.params);
   console.log(req.query);
   const { search } = req.body;
@@ -179,7 +209,7 @@ app.post("/items/search", (req, res) => {
 
 
 app.put("/items/:id", (req, res) => {
-
+  console.log(req.session);
   const { location, cost, bywhen, name } = req.body;
   const { id } = req.params;
 
@@ -206,6 +236,7 @@ app.put("/items/:id", (req, res) => {
 
 // DELETE USER
 app.delete("/items/:id", (req, res) => {
+  console.log(req.session);
   Items.destroy({
     where: {
       id: req.params.id,
