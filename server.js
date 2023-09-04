@@ -15,22 +15,26 @@ const BucketSession = new SessionStore({
 
 //Session Setup
 app.use(cookieParser());
-app.use(session({
-  secret: 'LarryDavid',
-  resave: false,
-  saveUninitialized: true,
-  store: BucketSession,
-  cookie: {
-    maxAge: 1000 * 3600
-  }
-}));
-
+app.use(
+  session({
+    secret: "LarryDavid",
+    resave: false,
+    saveUninitialized: true,
+    store: BucketSession,
+    cookie: {
+      maxAge: 1000 * 3600,
+    },
+  })
+);
 
 //PROFILE BACKEND///////////////////////////////////////////
 //CREATE NEW USER - Working
 app.post("/newuser", (req, res) => {
   console.log(req.session);
   const { firstname, lastname, email, username, password, age } = req.body;
+  if (!email || !password || !username) {
+    return res.json({ err: "email, password or username is empty" });
+  }
   let hashedPassword = bcrypt.hashSync(password, saltRounds);
   Users.create({
     firstname: firstname,
@@ -47,14 +51,16 @@ app.post("/newuser", (req, res) => {
       console.log(err);
       res.json({ err: "there was an error" });
     });
+  // app.get("/user/:id", (req, res) => {
+  //   res.redirect("/userdashboard.html");
+  // });
 });
-
 
 //FIND ALL USERS - Working, have not linked with items yet
 app.get("/users", (req, res) => {
   console.log(req.session);
   Users.findAll({
-    attributes: ["id", "firstname", "lastname", "email"],
+    attributes: ["id", "firstname", "lastname", "email", "username"],
     // include: [
     //   {
     //     model: items,
@@ -68,8 +74,24 @@ app.get("/users", (req, res) => {
   });
 });
 
+//GET User ID
+app.get("/user/:id", (req, res) => {
+  if (isNaN(Number(req.params.id))) {
+    return res.json({ err: "id needs to be a number" });
+  }
+  Users.findByPk(req.params.id, {
+    attributes: ["id", "firstname", "lastname", "email"],
+  })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.json({ err: "there was en error on the request" });
+    });
+});
 
-//GET User by first or last name
+//Retrieve User by first or last name
 app.post("/users/search", (req, res) => {
   console.log(req.session);
   console.log(req.params);
@@ -98,7 +120,6 @@ app.post("/users/search", (req, res) => {
   });
 });
 
-
 // DELETE USER
 app.delete("/users/:id", (req, res) => {
   console.log(req.session);
@@ -111,7 +132,6 @@ app.delete("/users/:id", (req, res) => {
     res.json({});
   });
 });
-
 
 //BUCKETLIST BACKEND//////////////////////////////////
 //CREATE NEW ITEM - Working
@@ -133,13 +153,11 @@ app.post("/newitem", (req, res) => {
     });
 });
 
-
 //FIND ALL Items - Working, have not linked with items yet
 app.get("/Items", (req, res) => {
   console.log(req.session);
   Items.findAll({
     attributes: ["id", "location", "cost", "bywhen", "name"],
-
   }).then((users) => {
     console.log(users);
 
@@ -147,7 +165,6 @@ app.get("/Items", (req, res) => {
   });
 });
 
-
 //GET Items by LOCATION or BYWHEN
 app.post("/items/search", (req, res) => {
   console.log(req.session);
@@ -177,7 +194,6 @@ app.post("/items/search", (req, res) => {
   });
 });
 
-
 //GET Items by LOCATION or BYWHEN
 app.post("/items/search", (req, res) => {
   console.log(req.session);
@@ -206,7 +222,6 @@ app.post("/items/search", (req, res) => {
     res.json(users);
   });
 });
-
 
 app.put("/items/:id", (req, res) => {
   console.log(req.session);
@@ -233,7 +248,6 @@ app.put("/items/:id", (req, res) => {
     });
 });
 
-
 // DELETE USER
 app.delete("/items/:id", (req, res) => {
   console.log(req.session);
@@ -246,7 +260,6 @@ app.delete("/items/:id", (req, res) => {
     res.json({});
   });
 });
-
 
 app.listen(3000, () => {
   console.log("App has started on http://localhost:3000/");
