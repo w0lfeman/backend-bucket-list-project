@@ -7,7 +7,7 @@ const cookieParser = require("cookie-parser");
 const SessionStore = require("express-session-sequelize")(session.Store);
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const { Users, Items, sequelize } = require("./models");
+const { User, Items, sequelize } = require("./models");
 const { Op } = require("sequelize");
 const BucketSession = new SessionStore({
   db: sequelize,
@@ -31,20 +31,20 @@ app.post("/user/login", (req, res) => {
   const { username, password } = req.body;
   
 
-  Users.findOne({
+  User.findOne({
     where: {
       username: username,
     },
-  }).then((users) => {
-    if (!users) {
+  }).then((user) => {
+    if (!user) {
       return res.json({ err: "no user found" });
     }
 
-    let comparison = bcrypt.compareSync(password, users.password);
-    console.log(password, users.password);
+    let comparison = bcrypt.compareSync(password, user.password);
+    console.log(password, user.password);
     console.log(comparison == true)
     if (comparison == true) {
-      req.session.users = users;
+      req.session.user = user;
       res.json({ success: true });
     } else {
       res.json({ success: false });
@@ -62,7 +62,7 @@ app.post("/newuser", (req, res) => {
     return res.json({ err: "email, password or username is empty" });
   }
   let hashedPassword = bcrypt.hashSync(password, saltRounds);
-  Users.create({
+  User.create({
     firstname: firstname,
     lastname: lastname,
     email: email,
@@ -85,7 +85,7 @@ app.post("/newuser", (req, res) => {
 //FIND ALL USERS - Working, have not linked with items yet
 app.get("/users", (req, res) => {
   console.log(req.session);
-  Users.findAll({
+  User.findAll({
     attributes: ["id", "firstname", "lastname", "email", "username"],
     // include: [
     //   {
@@ -96,7 +96,7 @@ app.get("/users", (req, res) => {
   }).then((users) => {
     console.log(users);
 
-    res.json(users);
+    res.json(user);
   });
 });
 
@@ -105,7 +105,7 @@ app.get("/user/:id", (req, res) => {
   if (isNaN(Number(req.params.id))) {
     return res.json({ err: "id needs to be a number" });
   }
-  Users.findByPk(req.params.id, {
+  User.findByPk(req.params.id, {
     attributes: ["id", "firstname", "lastname", "email"],
   })
     .then((user) => {
@@ -125,7 +125,7 @@ app.post("/users/search", (req, res) => {
   const { search } = req.body;
   console.log(search);
 
-  Users.findAll({
+  User.findAll({
     attributes: ["id", "firstname", "lastname", "email", "age"],
     where: {
       [Op.or]: [
@@ -141,15 +141,15 @@ app.post("/users/search", (req, res) => {
         },
       ],
     },
-  }).then((users) => {
-    res.json(users);
+  }).then((user) => {
+    res.json(user);
   });
 });
 
 // DELETE USER
 app.delete("/users/:id", (req, res) => {
   console.log(req.session);
-  Users.destroy({
+  User.destroy({
     where: {
       id: req.params.id,
     },
