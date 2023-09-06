@@ -26,7 +26,33 @@ app.use(
     },
   })
 );
+/////////
+app.post("/user/login", (req, res) => {
+  const { username, password } = req.body;
+  
 
+  Users.findOne({
+    where: {
+      username: username,
+    },
+  }).then((users) => {
+    if (!users) {
+      return res.json({ err: "no user found" });
+    }
+
+    let comparison = bcrypt.compareSync(password, users.password);
+    console.log(password, users.password);
+    console.log(comparison == true)
+    if (comparison == true) {
+      req.session.users = users;
+      res.json({ success: true });
+    } else {
+      res.json({ success: false });
+    }
+  });
+});
+
+///////////////////
 //PROFILE BACKEND///////////////////////////////////////////
 //CREATE NEW USER - Working
 app.post("/newuser", (req, res) => {
@@ -45,16 +71,16 @@ app.post("/newuser", (req, res) => {
     age: age,
   })
     .then((newUser) => {
-      res.json({ id: newUser.id });
+      req.session.user = newUser;
+      console.log(newUser)
+      res.json({ success: true });
     })
     .catch((err) => {
       console.log(err);
       res.json({ err: "there was an error" });
     });
-  // app.get("/user/:id", (req, res) => {
-  //   res.redirect("/userdashboard.html");
-  // });
 });
+
 
 //FIND ALL USERS - Working, have not linked with items yet
 app.get("/users", (req, res) => {
