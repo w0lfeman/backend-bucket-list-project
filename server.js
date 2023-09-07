@@ -27,9 +27,10 @@ app.use(
   })
 );
 /////////
+//PROFILE BACKEND///////////////////////////////////////////
+//USER LOGIN - Connected ///////////////////////////////////
 app.post("/user/login", (req, res) => {
   const { username, password } = req.body;
-  
 
   User.findOne({
     where: {
@@ -42,19 +43,20 @@ app.post("/user/login", (req, res) => {
 
     let comparison = bcrypt.compareSync(password, user.password);
     console.log(password, user.password);
-    console.log(comparison == true)
+    console.log(comparison == true);
     if (comparison == true) {
       req.session.user = user;
-      res.json({ success: true });
+      res.json({
+        success: true,
+      });
     } else {
       res.json({ success: false });
     }
   });
 });
 
-///////////////////
-//PROFILE BACKEND///////////////////////////////////////////
-//CREATE NEW USER - Working
+
+//CREATE NEW USER - Connected///////////////////////////////
 app.post("/newuser", (req, res) => {
   console.log(req.session);
   const { firstname, lastname, email, username, password, age } = req.body;
@@ -82,7 +84,7 @@ app.post("/newuser", (req, res) => {
 });
 
 
-//FIND ALL USERS - Working, have not linked with items yet
+//FIND ALL USERS - Working, have not linked with items yet///////////////////////
 app.get("/users", (req, res) => {
   console.log(req.session);
   User.findAll({
@@ -100,7 +102,15 @@ app.get("/users", (req, res) => {
   });
 });
 
-//GET User ID
+
+//####################### Required to get session for now
+app.get("/userloginload", (req, res) => {
+  res.json({ sessionData: req.session });
+});
+//#######################
+
+
+//GET User ID////////////////////////////////////////////////////////////////////
 app.get("/user/:id", (req, res) => {
   if (isNaN(Number(req.params.id))) {
     return res.json({ err: "id needs to be a number" });
@@ -117,7 +127,7 @@ app.get("/user/:id", (req, res) => {
     });
 });
 
-//Retrieve User by first or last name
+//Retrieve User by first or last name//////////////////////////////////////////////
 app.post("/users/search", (req, res) => {
   console.log(req.session);
   console.log(req.params);
@@ -146,7 +156,7 @@ app.post("/users/search", (req, res) => {
   });
 });
 
-// DELETE USER
+// DELETE USER//////////////////////////////////////////////////////
 app.delete("/users/:id", (req, res) => {
   console.log(req.session);
   User.destroy({
@@ -160,7 +170,7 @@ app.delete("/users/:id", (req, res) => {
 });
 
 //BUCKETLIST BACKEND//////////////////////////////////
-//CREATE NEW ITEM - Working
+//CREATE NEW ITEM - Working///////////////////////////////////
 app.post("/newitem", (req, res) => {
   console.log(req.session);
   const { location, cost, bywhen, name } = req.body;
@@ -179,7 +189,7 @@ app.post("/newitem", (req, res) => {
     });
 });
 
-//FIND ALL Items - Working, have not linked with items yet
+//FIND ALL Items - Working, have not linked with items yet////////////////////////////
 app.get("/Items", (req, res) => {
   console.log(req.session);
   Items.findAll({
@@ -191,7 +201,7 @@ app.get("/Items", (req, res) => {
   });
 });
 
-//GET Items by LOCATION or BYWHEN
+//GET Items by LOCATION or BYWHEN////////////////////////////////////////////////////
 app.post("/items/search", (req, res) => {
   console.log(req.session);
   console.log(req.params);
@@ -220,7 +230,7 @@ app.post("/items/search", (req, res) => {
   });
 });
 
-//GET Items by LOCATION or BYWHEN
+//GET Items by LOCATION or BYWHEN/////////////////////////////////////////////////////
 app.post("/items/search", (req, res) => {
   console.log(req.session);
   console.log(req.params);
@@ -249,6 +259,8 @@ app.post("/items/search", (req, res) => {
   });
 });
 
+
+//UPDATE Items//////////////////////////////////////////////////////////////
 app.put("/items/:id", (req, res) => {
   console.log(req.session);
   const { location, cost, bywhen, name } = req.body;
@@ -274,7 +286,7 @@ app.put("/items/:id", (req, res) => {
     });
 });
 
-// DELETE USER
+// DELETE ITEM////////////////////////////////
 app.delete("/items/:id", (req, res) => {
   console.log(req.session);
   Items.destroy({
