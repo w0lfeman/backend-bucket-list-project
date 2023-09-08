@@ -28,6 +28,12 @@ app.use(
 );
 /////////
 //PROFILE BACKEND///////////////////////////////////////////
+//####################### Required to get session for now
+app.get("/userloginload", (req, res) => {
+  res.json({ sessionData: req.session });
+});
+//#######################
+
 //USER LOGIN - Connected ///////////////////////////////////
 app.post("/user/login", (req, res) => {
   const { username, password } = req.body;
@@ -42,8 +48,8 @@ app.post("/user/login", (req, res) => {
     }
 
     let comparison = bcrypt.compareSync(password, user.password);
-    console.log(password, user.password);
-    console.log(comparison == true);
+    // console.log(password, user.password);
+    // console.log(comparison == true);
     if (comparison == true) {
       req.session.user = user;
       res.json({
@@ -58,7 +64,7 @@ app.post("/user/login", (req, res) => {
 
 //CREATE NEW USER - Connected///////////////////////////////
 app.post("/newuser", (req, res) => {
-  console.log(req.session);
+  //console.log(req.session);
   const { firstname, lastname, email, username, password, age } = req.body;
   if (!email || !password || !username) {
     return res.json({ err: "email, password or username is empty" });
@@ -74,40 +80,32 @@ app.post("/newuser", (req, res) => {
   })
     .then((newUser) => {
       req.session.user = newUser;
-      console.log(newUser)
+      //console.log(newUser)
       res.json({ success: true });
     })
     .catch((err) => {
-      console.log(err);
+      //console.log(err);
       res.json({ err: "there was an error" });
     });
 });
 
 
-//FIND ALL USERS - Working, have not linked with items yet///////////////////////
+//FIND ALL USERS - NOT CONNECTED///////////////////////
 app.get("/users", (req, res) => {
-  console.log(req.session);
+  //console.log(req.session);
   User.findAll({
     attributes: ["id", "firstname", "lastname", "email", "username"],
-    // include: [
-    //   {
-    //     model: items,
-    //     attributes: ["location", "cost", "bywhen", "name"],
-    //   },
-    // ],
+    include: [
+      {
+        model: Items,
+        attributes: ["location", "cost", "bywhen", "name"],
+      },
+    ],
   }).then((users) => {
-    console.log(users);
-
-    res.json(user);
+    //console.log(users);
+    res.json(users);
   });
 });
-
-
-//####################### Required to get session for now
-app.get("/userloginload", (req, res) => {
-  res.json({ sessionData: req.session });
-});
-//#######################
 
 
 //GET User ID////////////////////////////////////////////////////////////////////
@@ -122,18 +120,19 @@ app.get("/user/:id", (req, res) => {
       res.json(user);
     })
     .catch((err) => {
-      console.log(err);
+      //console.log(err);
       res.json({ err: "there was en error on the request" });
     });
 });
 
+
 //Retrieve User by first or last name//////////////////////////////////////////////
 app.post("/users/search", (req, res) => {
-  console.log(req.session);
-  console.log(req.params);
-  console.log(req.query);
+  //console.log(req.session);
+  //console.log(req.params);
+  //console.log(req.query);
   const { search } = req.body;
-  console.log(search);
+  //console.log(search);
 
   User.findAll({
     attributes: ["id", "firstname", "lastname", "email", "age"],
@@ -158,56 +157,62 @@ app.post("/users/search", (req, res) => {
 
 // DELETE USER//////////////////////////////////////////////////////
 app.delete("/users/:id", (req, res) => {
-  console.log(req.session);
+  //console.log(req.session);
   User.destroy({
     where: {
       id: req.params.id,
     },
   }).then((results) => {
-    console.log(results);
+    //console.log(results);
     res.json({});
   });
 });
 
 //BUCKETLIST BACKEND//////////////////////////////////
-//CREATE NEW ITEM - Working///////////////////////////////////
+//CREATE NEW ITEM - Connected///////////////////////////////////
 app.post("/newitem", (req, res) => {
-  console.log(req.session);
-  const { location, cost, bywhen, name } = req.body;
+  //console.log(req.session);
+  const { location, cost, bywhen, name, userId} = req.body;
   Items.create({
     location: location,
     cost: cost,
     bywhen: bywhen,
     name: name,
+    userId: userId
   })
     .then((newItem) => {
+      //console.log(newItem)
       res.json({ id: newItem.id });
     })
     .catch((err) => {
-      console.log(err);
+      //console.log(err);
       res.json({ err: "there was an error" });
     });
 });
 
 //FIND ALL Items - Working, have not linked with items yet////////////////////////////
-app.get("/Items", (req, res) => {
-  console.log(req.session);
+app.get("/Items/:id", (req, res) => {
+  //console.log(req.session);
   Items.findAll({
     attributes: ["id", "location", "cost", "bywhen", "name"],
+    where: {
+      userId: req.params.id,
+    },
   }).then((users) => {
-    console.log(users);
+    //console.log(users);
 
     res.json(users);
   });
 });
+
 
 //GET Items by LOCATION or BYWHEN////////////////////////////////////////////////////
 app.post("/items/search", (req, res) => {
-  console.log(req.session);
-  console.log(req.params);
-  console.log(req.query);
+  //console.log(req.session);
+  //console.log(req.params);
+  //console.log(req.query);
   const { search } = req.body;
-  console.log(search);
+  //console.log(search);
 
   Items.findAll({
     attributes: ["id", "location", "cost", "bywhen", "name"],
@@ -230,39 +235,11 @@ app.post("/items/search", (req, res) => {
   });
 });
 
-//GET Items by LOCATION or BYWHEN/////////////////////////////////////////////////////
-app.post("/items/search", (req, res) => {
-  console.log(req.session);
-  console.log(req.params);
-  console.log(req.query);
-  const { search } = req.body;
-  console.log(search);
-
-  Items.findAll({
-    attributes: ["id", "location", "cost", "bywhen", "name"],
-    where: {
-      [Op.or]: [
-        {
-          location: {
-            [Op.iLike]: "%" + search + "%",
-          },
-        },
-        {
-          bywhen: {
-            [Op.iLike]: "%" + search + "%",
-          },
-        },
-      ],
-    },
-  }).then((users) => {
-    res.json(users);
-  });
-});
 
 
 //UPDATE Items//////////////////////////////////////////////////////////////
 app.put("/items/:id", (req, res) => {
-  console.log(req.session);
+  //console.log(req.session);
   const { location, cost, bywhen, name } = req.body;
   const { id } = req.params;
 
@@ -275,12 +252,12 @@ app.put("/items/:id", (req, res) => {
     }
   )
     .then((result) => {
-      console.log(result);
+      //console.log(result);
 
       res.json({});
     })
     .catch((err) => {
-      console.log(err);
+      //console.log(err);
 
       res.json({ err: "there was an error in your request" });
     });
@@ -294,11 +271,11 @@ app.delete("/items/:id", (req, res) => {
       id: req.params.id,
     },
   }).then((results) => {
-    console.log(results);
+    //console.log(results);
     res.json({});
   });
 });
 
 app.listen(3000, () => {
-  console.log("App has started on http://localhost:3000/");
+  //console.log("App has started on http://localhost:3000/");
 });

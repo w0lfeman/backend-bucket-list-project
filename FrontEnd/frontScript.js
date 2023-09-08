@@ -47,8 +47,6 @@ register.addEventListener("submit", (event) => {
   })
     .then((res) => res.json())
     .then((data) => {
-      console.log("THIS IS DATA", data);
-      console.log("THIS IS DATA.ERROR", data.error);
       if (data.success) {
         window.location.href = "http://localhost:3000/userdashboard";
       } else {

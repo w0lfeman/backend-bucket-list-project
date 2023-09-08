@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Welcome to your Bucket List</title>
-</head>
-<body>
-   <div id="header">
-   </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to your Bucket List</title>
+  </head>
+  <body>
+    <div id="header"></div>
 
-   <div id="bucketList">
-   </div>
-   <script src="dashScript.js">
-   </script>
-</body>
+    <div>
+      <form id="bucketlistsubmit">
+        <h2>What do you want to do before you die?</h2>
+        <input type="text" name="name" placeholder="What to do?" />
+        <input type="text" name="location" placeholder="Where to do it?" />
+        <input type="text" name="cost" placeholder="How much to budget?" />
+        <input type="text" name="bywhen" placeholder="When to do it?" />
+        <button type="submit">Add to Bucket</button>
+      </form>
+    </div>
+
+    <div id = "bucketlist">
+
+    </div>
+    <script src="dashScript.js"></script>
+  </body>
 </html>
