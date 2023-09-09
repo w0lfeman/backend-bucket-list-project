@@ -1,6 +1,6 @@
 const login = document.getElementById("loginform");
 const register = document.getElementById("registerForm");
-
+const PORT = process.env.PORT || 3000;
 
 document.getElementById("loginform").addEventListener("submit", (event) => {
   event.preventDefault();
@@ -22,7 +22,7 @@ document.getElementById("loginform").addEventListener("submit", (event) => {
     .then((data) => {
       console.log(data);
       if (data.success) {
-        window.location.href = "http://localhost:3000/userdashboard";
+        window.location.href = `http://localhost:${PORT}/userdashboard`;
       } else {
         alert("Incorrect credentials");
       }
@@ -48,7 +48,7 @@ register.addEventListener("submit", (event) => {
     .then((res) => res.json())
     .then((data) => {
       if (data.success) {
-        window.location.href = "http://localhost:3000/userdashboard";
+        window.location.href = `http://localhost:${PORT}/userdashboard`;
       } else {
         alert("Profile already exists with this email or username");
       }

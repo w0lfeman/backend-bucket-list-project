@@ -1,6 +1,7 @@
 const header = document.getElementById("header");
 const bucketlistsubmit = document.getElementById("bucketlistsubmit");
 const bucketlist = document.getElementById("bucketlist");
+const PORT = process.env.PORT || 3000;
 
 //Session function
 async function getonloaddata() {
@@ -131,7 +132,7 @@ function deleteuserprofile(id) {
     .then((data) => {
       console.log(data);
       if (data.success) {
-        window.location.href = "http://localhost:3000/";
+        window.location.href = `http://localhost:${PORT}/`;
       } else {
         alert("Could not delete");
       }
