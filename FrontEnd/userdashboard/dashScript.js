@@ -9,8 +9,8 @@ async function getonloaddata() {
     .then((data) => {
       return data;
     });
-  console.log(onloaddata)
-  return onloaddata
+  console.log(onloaddata);
+  return onloaddata;
 }
 
 //Function to load bucketlish from backend database
@@ -24,7 +24,7 @@ async function getBucketList() {
 }
 
 //Window load
-window.addEventListener("load", async(event) => {
+window.addEventListener("load", async (event) => {
   event.preventDefault();
   const data = await getonloaddata();
   header.innerHTML = `<h2>Welcome to your Bucket List Dash Board, ${data.sessionData.user.username}, or shall I call you ${data.sessionData.user.firstname} ${data.sessionData.user.lastname}!!!</h2>
@@ -34,9 +34,9 @@ window.addEventListener("load", async(event) => {
 });
 
 //Submit to add to user list
-bucketlistsubmit.addEventListener("submit", async(event) => {
+bucketlistsubmit.addEventListener("submit", async (event) => {
   event.preventDefault();
-   const data = await getonloaddata();
+  const data = await getonloaddata();
   fetch("/newitem", {
     method: "POST",
     headers: {
@@ -53,21 +53,25 @@ bucketlistsubmit.addEventListener("submit", async(event) => {
     .then((res) => res.json())
     .then((data) => {
       console.log(data);
+      event.target.name.value = "";
+      event.target.location.value = "";
+      event.target.cost.value = "";
+      event.target.bywhen.value = "";
       getBucketList();
     });
 });
-// getBucketList();
+
 //Function to dynamically map bucketlist to <li> with edit and delete buttons
 function showuseritems(items) {
   return items
     .map((item) => {
       return `
-            <li>Activity: ${item.name} Location: ${item.location} Cost: ${item.cost} By when: ${item.bywhen}
+            <li>I want to ${item.name} at ${item.location} with the budget of ${item.cost} by this date: ${item.bywhen}
               <form id="edititem">
               <input type="text" class="editContent" name="name" placeholder="Edit Name">
               <input type="text" class="editContent" name="location" placeholder="Edit Location">
               <input type="text" class="editContent" name="cost" placeholder="Edit Cost">
-              <input type="text" class="editContent" name="bywhen" placeholder="Edit By When">
+              <input type="date" class="editContent" name="bywhen" placeholder="Edit By When">
                 <button type="submit" onclick="startEdit(${item.id})">Edit Content</button>
               </form>
               <button onclick="deletebucketitem(${item.id})">DELETE THIS BUCKET LIST ITEM</button>
@@ -79,10 +83,11 @@ function showuseritems(items) {
 
 //Function to edit an item in bucket list
 function startEdit(id) {
+  
   const edititem = document.getElementById("edititem");
   edititem.addEventListener("submit", async (event) => {
     event.preventDefault();
-    console.log("TESTING",event.target);
+    console.log(event.target.name.value)
     await fetch(`/items/${id}`, {
       method: "PUT",
       headers: {
@@ -93,7 +98,6 @@ function startEdit(id) {
         location: event.target.location.value,
         cost: event.target.cost.value,
         bywhen: event.target.bywhen.value,
-        // userId: data.sessionData.user.id,
       }),
     })
       .then((res) => res.json())
@@ -104,7 +108,6 @@ function startEdit(id) {
         } else {
           getBucketList();
         }
-        
       });
   });
 }

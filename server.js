@@ -40,7 +40,9 @@ app.post("/user/login", (req, res) => {
 
   User.findOne({
     where: {
-      username: username,
+      username: {
+        [Op.iLike]: "%" + username + "%",
+      },
     },
   }).then((user) => {
     if (!user) {
@@ -139,9 +141,9 @@ app.post("/newuser", (req, res) => {
 //     where: {
 //       [Op.or]: [
 //         {
-//           firstname: {
-//             [Op.iLike]: "%" + search + "%",
-//           },
+          // firstname: {
+          //   [Op.iLike]: "%" + search + "%",
+          // },
 //         },
 //         {
 //           lastname: {
