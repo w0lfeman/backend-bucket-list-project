@@ -28,11 +28,11 @@ app.use(
 );
 /////////
 //PROFILE BACKEND///////////////////////////////////////////
-//####################### Required to get session for now
+///// Session - Connected //////
 app.get("/userloginload", (req, res) => {
   res.json({ sessionData: req.session });
 });
-//#######################
+/////
 
 //USER LOGIN - Connected ///////////////////////////////////
 app.post("/user/login", (req, res) => {
@@ -90,70 +90,70 @@ app.post("/newuser", (req, res) => {
 });
 
 
-//FIND ALL USERS - NOT CONNECTED///////////////////////
-app.get("/users", (req, res) => {
-  //console.log(req.session);
-  User.findAll({
-    attributes: ["id", "firstname", "lastname", "email", "username"],
-    include: [
-      {
-        model: Items,
-        attributes: ["location", "cost", "bywhen", "name"],
-      },
-    ],
-  }).then((users) => {
-    //console.log(users);
-    res.json(users);
-  });
-});
+// //FIND ALL USERS - Not Using///////////////////////
+// app.get("/users", (req, res) => {
+//   //console.log(req.session);
+//   User.findAll({
+//     attributes: ["id", "firstname", "lastname", "email", "username"],
+//     include: [
+//       {
+//         model: Items,
+//         attributes: ["location", "cost", "bywhen", "name"],
+//       },
+//     ],
+//   }).then((users) => {
+//     //console.log(users);
+//     res.json(users);
+//   });
+// });
 
 
-//GET User ID////////////////////////////////////////////////////////////////////
-app.get("/user/:id", (req, res) => {
-  if (isNaN(Number(req.params.id))) {
-    return res.json({ err: "id needs to be a number" });
-  }
-  User.findByPk(req.params.id, {
-    attributes: ["id", "firstname", "lastname", "email"],
-  })
-    .then((user) => {
-      res.json(user);
-    })
-    .catch((err) => {
-      //console.log(err);
-      res.json({ err: "there was en error on the request" });
-    });
-});
+// //GET User ID//////////////////Not Using //////////////////////////////////////////////////
+// app.get("/user/:id", (req, res) => {
+//   if (isNaN(Number(req.params.id))) {
+//     return res.json({ err: "id needs to be a number" });
+//   }
+//   User.findByPk(req.params.id, {
+//     attributes: ["id", "firstname", "lastname", "email"],
+//   })
+//     .then((user) => {
+//       res.json(user);
+//     })
+//     .catch((err) => {
+//       //console.log(err);
+//       res.json({ err: "there was en error on the request" });
+//     });
+// });
 
 
-//Retrieve User by first or last name//////////////////////////////////////////////
-app.post("/users/search", (req, res) => {
-  //console.log(req.session);
-  //console.log(req.params);
-  //console.log(req.query);
-  const { search } = req.body;
-  //console.log(search);
+// //Retrieve User by first or last name///////////////Not used///////////////////////////////
+// app.post("/users/search", (req, res) => {
+//   //console.log(req.session);
+//   //console.log(req.params);
+//   //console.log(req.query);
+//   const { search } = req.body;
+//   //console.log(search);
 
-  User.findAll({
-    attributes: ["id", "firstname", "lastname", "email", "age"],
-    where: {
-      [Op.or]: [
-        {
-          firstname: {
-            [Op.iLike]: "%" + search + "%",
-          },
-        },
-        {
-          lastname: {
-            [Op.iLike]: "%" + search + "%",
-          },
-        },
-      ],
-    },
-  }).then((user) => {
-    res.json(user);
-  });
-});
+//   User.findAll({
+//     attributes: ["id", "firstname", "lastname", "email", "age"],
+//     where: {
+//       [Op.or]: [
+//         {
+//           firstname: {
+//             [Op.iLike]: "%" + search + "%",
+//           },
+//         },
+//         {
+//           lastname: {
+//             [Op.iLike]: "%" + search + "%",
+//           },
+//         },
+//       ],
+//     },
+//   }).then((user) => {
+//     res.json(user);
+//   });
+// });
 
 // DELETE USER//////////////////////////////////////////////////////
 app.delete("/users/:id", (req, res) => {
@@ -164,7 +164,7 @@ app.delete("/users/:id", (req, res) => {
     },
   }).then((results) => {
     //console.log(results);
-    res.json({});
+    res.json({ success: true });
   });
 });
 
@@ -190,7 +190,7 @@ app.post("/newitem", (req, res) => {
     });
 });
 
-//FIND ALL Items - Working, have not linked with items yet////////////////////////////
+//FIND ALL Items - Connected///////////////////////////
 app.get("/Items/:id", (req, res) => {
   //console.log(req.session);
   Items.findAll({
@@ -206,38 +206,38 @@ app.get("/Items/:id", (req, res) => {
 });
 
 
-//GET Items by LOCATION or BYWHEN////////////////////////////////////////////////////
-app.post("/items/search", (req, res) => {
-  //console.log(req.session);
-  //console.log(req.params);
-  //console.log(req.query);
-  const { search } = req.body;
-  //console.log(search);
+// //GET Items by LOCATION or BYWHEN////////////////////Not Used////////////////////////////////
+// app.post("/items/search", (req, res) => {
+//   //console.log(req.session);
+//   //console.log(req.params);
+//   //console.log(req.query);
+//   const { search } = req.body;
+//   //console.log(search);
 
-  Items.findAll({
-    attributes: ["id", "location", "cost", "bywhen", "name"],
-    where: {
-      [Op.or]: [
-        {
-          location: {
-            [Op.iLike]: "%" + search + "%",
-          },
-        },
-        {
-          bywhen: {
-            [Op.iLike]: "%" + search + "%",
-          },
-        },
-      ],
-    },
-  }).then((users) => {
-    res.json(users);
-  });
-});
+//   Items.findAll({
+//     attributes: ["id", "location", "cost", "bywhen", "name"],
+//     where: {
+//       [Op.or]: [
+//         {
+//           location: {
+//             [Op.iLike]: "%" + search + "%",
+//           },
+//         },
+//         {
+//           bywhen: {
+//             [Op.iLike]: "%" + search + "%",
+//           },
+//         },
+//       ],
+//     },
+//   }).then((users) => {
+//     res.json(users);
+//   });
+// });
 
 
 
-//UPDATE Items//////////////////////////////////////////////////////////////
+//UPDATE Items Connected//////////////////////////////////////////////////////////////
 app.put("/items/:id", (req, res) => {
   //console.log(req.session);
   const { location, cost, bywhen, name } = req.body;
@@ -259,22 +259,25 @@ app.put("/items/:id", (req, res) => {
     .catch((err) => {
       //console.log(err);
 
-      res.json({ err: "there was an error in your request" });
+      res.json({ err: "Please Make Sure To Edit All Fields" });
     });
 });
 
-// DELETE ITEM////////////////////////////////
+// DELETE ITEM Connected////////////////////////////////
 app.delete("/items/:id", (req, res) => {
+  console.log("TEST HERE");
   console.log(req.session);
+  console.log(req.params.id)
   Items.destroy({
     where: {
       id: req.params.id,
     },
   }).then((results) => {
     //console.log(results);
-    res.json({});
+    res.json({results});
   });
 });
+
 
 app.listen(3000, () => {
   //console.log("App has started on http://localhost:3000/");
