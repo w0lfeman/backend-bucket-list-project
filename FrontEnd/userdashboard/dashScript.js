@@ -67,7 +67,7 @@ function showuseritems(items) {
     .map((item) => {
       return `
             <li>I want to ${item.name} at ${item.location} with the budget of ${item.cost} by this date: ${item.bywhen}
-              <form id="edititem">
+              <form id="edititem-${item.id}">
               <input type="text" class="editContent" name="name" placeholder="Edit Name">
               <input type="text" class="editContent" name="location" placeholder="Edit Location">
               <input type="text" class="editContent" name="cost" placeholder="Edit Cost">
@@ -83,11 +83,11 @@ function showuseritems(items) {
 
 //Function to edit an item in bucket list
 function startEdit(id) {
-  
-  const edititem = document.getElementById("edititem");
+  console.log(id);
+  const edititem = document.getElementById(`edititem-${item.id}`);
   edititem.addEventListener("submit", async (event) => {
     event.preventDefault();
-    console.log(event.target.name.value)
+    console.log(event.target.name.value);
     await fetch(`/items/${id}`, {
       method: "PUT",
       headers: {

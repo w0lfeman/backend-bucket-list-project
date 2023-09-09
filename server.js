@@ -9,6 +9,7 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const { User, Items, sequelize } = require("./models");
 const { Op } = require("sequelize");
+const PORT = process.env.PORT || 3000;
 const BucketSession = new SessionStore({
   db: sequelize,
 });
@@ -63,7 +64,6 @@ app.post("/user/login", (req, res) => {
   });
 });
 
-
 //CREATE NEW USER - Connected///////////////////////////////
 app.post("/newuser", (req, res) => {
   //console.log(req.session);
@@ -91,7 +91,6 @@ app.post("/newuser", (req, res) => {
     });
 });
 
-
 // //FIND ALL USERS - Not Using///////////////////////
 // app.get("/users", (req, res) => {
 //   //console.log(req.session);
@@ -108,7 +107,6 @@ app.post("/newuser", (req, res) => {
 //     res.json(users);
 //   });
 // });
-
 
 // //GET User ID//////////////////Not Using //////////////////////////////////////////////////
 // app.get("/user/:id", (req, res) => {
@@ -127,7 +125,6 @@ app.post("/newuser", (req, res) => {
 //     });
 // });
 
-
 // //Retrieve User by first or last name///////////////Not used///////////////////////////////
 // app.post("/users/search", (req, res) => {
 //   //console.log(req.session);
@@ -141,9 +138,9 @@ app.post("/newuser", (req, res) => {
 //     where: {
 //       [Op.or]: [
 //         {
-          // firstname: {
-          //   [Op.iLike]: "%" + search + "%",
-          // },
+// firstname: {
+//   [Op.iLike]: "%" + search + "%",
+// },
 //         },
 //         {
 //           lastname: {
@@ -160,6 +157,7 @@ app.post("/newuser", (req, res) => {
 // DELETE USER//////////////////////////////////////////////////////
 app.delete("/users/:id", (req, res) => {
   //console.log(req.session);
+  req.session.destroy;
   User.destroy({
     where: {
       id: req.params.id,
@@ -174,13 +172,13 @@ app.delete("/users/:id", (req, res) => {
 //CREATE NEW ITEM - Connected///////////////////////////////////
 app.post("/newitem", (req, res) => {
   //console.log(req.session);
-  const { location, cost, bywhen, name, userId} = req.body;
+  const { location, cost, bywhen, name, userId } = req.body;
   Items.create({
     location: location,
     cost: cost,
     bywhen: bywhen,
     name: name,
-    userId: userId
+    userId: userId,
   })
     .then((newItem) => {
       //console.log(newItem)
@@ -206,7 +204,6 @@ app.get("/Items/:id", (req, res) => {
     res.json(users);
   });
 });
-
 
 // //GET Items by LOCATION or BYWHEN////////////////////Not Used////////////////////////////////
 // app.post("/items/search", (req, res) => {
@@ -236,8 +233,6 @@ app.get("/Items/:id", (req, res) => {
 //     res.json(users);
 //   });
 // });
-
-
 
 //UPDATE Items Connected//////////////////////////////////////////////////////////////
 app.put("/items/:id", (req, res) => {
@@ -269,18 +264,17 @@ app.put("/items/:id", (req, res) => {
 app.delete("/items/:id", (req, res) => {
   console.log("TEST HERE");
   console.log(req.session);
-  console.log(req.params.id)
+  console.log(req.params.id);
   Items.destroy({
     where: {
       id: req.params.id,
     },
   }).then((results) => {
     //console.log(results);
-    res.json({results});
+    res.json({ results });
   });
 });
 
-
-app.listen(3000, () => {
+app.listen(PORT, () => {
   //console.log("App has started on http://localhost:3000/");
 });

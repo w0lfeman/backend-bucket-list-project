@@ -1,10 +1,7 @@
 {
   "development": {
-    "username": "fqyliedg",
-    "password": "HasSMFH-jYnB-hA_ROi4Dp9Fpfe5PTIA",
-    "database": "fqyliedg",
-    "host": "berry.db.elephantsql.com",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "use_env_variable": "DB_URL"
   },
   "test": {
     "username": "root",
@@ -14,10 +11,7 @@
     "dialect": "postgres"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
+    "use_env_variable": "DB_URL",
     "dialect": "postgres"
   }
 }
